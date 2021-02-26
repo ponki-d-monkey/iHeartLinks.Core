@@ -9,7 +9,6 @@ namespace iHeartLinks.Core.Tests
     {
         private const string TestRel = "link";
         private const string TestHref = "https://iheartlinks.example.com";
-        private const string TestMethod = "GET";
 
         private readonly Mock<IHypermediaBuilder<IHypermediaDocument>> mockSut;
         private readonly IHypermediaBuilder<IHypermediaDocument> sut;
@@ -38,7 +37,7 @@ namespace iHeartLinks.Core.Tests
             mockSut.Verify(x => 
                 x.AddLink(
                     It.Is<string>(y => y == TestRel), 
-                    It.Is<Link>(y => y.Href == TestHref && y.Method == null)), 
+                    It.Is<Link>(y => y.Href == TestHref)), 
                 Times.Once);
         }
 
@@ -46,36 +45,6 @@ namespace iHeartLinks.Core.Tests
         public void AddLinkShouldReturnSameInstanceOfHypermediaBuilder()
         {
             var result = sut.AddLink(TestRel, TestHref);
-
-            result.Should().BeSameAs(sut);
-        }
-
-        [Fact]
-        public void AddLinkWithMethodShouldThrowArgumentNullExceptionWhenBuilderIsNull()
-        {
-            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => default(IHypermediaBuilder<IHypermediaDocument>).AddLink(TestRel, TestHref, TestMethod);
-
-            func.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("builder");
-
-            mockSut.Verify(x => x.AddLink(It.IsAny<string>(), It.IsAny<Link>()), Times.Never);
-        }
-
-        [Fact]
-        public void AddLinkWithMethodShouldInvokeHypermediaBuilderAddLinkMethod()
-        {
-            sut.AddLink(TestRel, TestHref, TestMethod);
-
-            mockSut.Verify(x =>
-                x.AddLink(
-                    It.Is<string>(y => y == TestRel),
-                    It.Is<Link>(y => y.Href == TestHref && y.Method == TestMethod)),
-                Times.Once);
-        }
-
-        [Fact]
-        public void AddLinkWithMethodShouldReturnSameInstanceOfHypermediaBuilder()
-        {
-            var result = sut.AddLink(TestRel, TestHref, TestMethod);
 
             result.Should().BeSameAs(sut);
         }
@@ -200,7 +169,7 @@ namespace iHeartLinks.Core.Tests
             mockSut.Verify(x =>
                 x.AddLink(
                     It.Is<string>(y => y == TestRel),
-                    It.Is<Link>(y => y.Href == TestHref && y.Method == null)),
+                    It.Is<Link>(y => y.Href == TestHref)),
                 Times.Once);
 
             void HandleBuilder(IHypermediaBuilder<IHypermediaDocument> builder)

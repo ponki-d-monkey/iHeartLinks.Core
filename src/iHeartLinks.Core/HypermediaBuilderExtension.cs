@@ -19,21 +19,6 @@ namespace iHeartLinks.Core
             return builder;
         }
 
-        public static IHypermediaBuilder<TDocument> AddLink<TDocument>(this IHypermediaBuilder<TDocument> builder, string rel, string href, string method)
-            where TDocument : IHypermediaDocument
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            var link = new Link(href, method);
-
-            builder.AddLink(rel, link);
-
-            return builder;
-        }
-
         public static IHypermediaBuilder<TDocument> AddLinksToChild<TDocument>(this IHypermediaBuilder<TDocument> builder, Action<TDocument, IHypermediaService> childHandler)
             where TDocument : IHypermediaDocument
         {
