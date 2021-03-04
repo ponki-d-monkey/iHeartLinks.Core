@@ -8,7 +8,6 @@ namespace iHeartLinks.Core.Tests
     public sealed class HypermediaServiceExtensionTests
     {
         private const string TestHref = "https://iheartlinks.example.com";
-        private const string TestMethod = "GET";
 
         private readonly Mock<IHypermediaDocument> mockDocument;
         private readonly Mock<IHypermediaService> mockSut;
@@ -19,8 +18,7 @@ namespace iHeartLinks.Core.Tests
             mockDocument = new Mock<IHypermediaDocument>();
 
             mockSut = new Mock<IHypermediaService>();
-            mockSut.Setup(x => x.GetCurrentUrl()).Returns(TestHref);
-            mockSut.Setup(x => x.GetCurrentMethod()).Returns(TestMethod);
+            mockSut.Setup(x => x.GetLink()).Returns(new Link(TestHref));
 
             sut = mockSut.Object;
         }
@@ -32,8 +30,7 @@ namespace iHeartLinks.Core.Tests
 
             func.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("service");
 
-            mockSut.Verify(x => x.GetCurrentUrl(), Times.Never);
-            mockSut.Verify(x => x.GetCurrentMethod(), Times.Never);
+            mockSut.Verify(x => x.GetLink(), Times.Never);
 
             mockDocument.Verify(x => x.AddLink(It.IsAny<string>(), It.IsAny<Link>()), Times.Never);
         }
@@ -45,26 +42,17 @@ namespace iHeartLinks.Core.Tests
 
             func.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("document");
 
-            mockSut.Verify(x => x.GetCurrentUrl(), Times.Never);
-            mockSut.Verify(x => x.GetCurrentMethod(), Times.Never);
+            mockSut.Verify(x => x.GetLink(), Times.Never);
 
             mockDocument.Verify(x => x.AddLink(It.IsAny<string>(), It.IsAny<Link>()), Times.Never);
         }
 
         [Fact]
-        public void AddSelfShouldInvokeHypermediaServiceGetCurrentUrlMethod()
+        public void AddSelfShouldInvokeHypermediaServiceGetLinkMethod()
         {
             sut.AddSelf(mockDocument.Object);
 
-            mockSut.Verify(x => x.GetCurrentUrl(), Times.Once);
-        }
-
-        [Fact]
-        public void AddSelfShouldInvokeHypermediaServiceGetCurrentMethodMethod()
-        {
-            sut.AddSelf(mockDocument.Object);
-
-            mockSut.Verify(x => x.GetCurrentMethod(), Times.Once);
+            mockSut.Verify(x => x.GetLink(), Times.Once);
         }
 
         [Fact]
@@ -75,7 +63,7 @@ namespace iHeartLinks.Core.Tests
             mockDocument.Verify(x =>
                 x.AddLink(
                     It.Is<string>(y => y == "self"),
-                    It.Is<Link>(y => y.Href == TestHref && y.Method == TestMethod)),
+                    It.Is<Link>(y => y.Href == TestHref)),
                 Times.Once);
         }
 

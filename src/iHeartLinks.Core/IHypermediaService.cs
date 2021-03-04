@@ -2,18 +2,8 @@
 {
     public interface IHypermediaService
     {
-        string GetCurrentUrl();
+        Link GetLink();
 
-        string GetUrl(string key);
-
-        string GetUrl(string key, object args);
-
-        string GetCurrentUrlTemplate();
-
-        string GetUrlTemplate(string key);
-
-        string GetCurrentMethod();
-
-        string GetMethod(string key);
+        Link GetLink(string request, object args);
     }
 }

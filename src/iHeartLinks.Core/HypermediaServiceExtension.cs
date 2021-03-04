@@ -19,9 +19,7 @@ namespace iHeartLinks.Core
                 throw new ArgumentNullException(nameof(document));
             }
 
-            var link = new Link(
-                service.GetCurrentUrl(),
-                service.GetCurrentMethod());
+            var link = service.GetLink();
 
             document.AddLink(SelfRel, link);
 
