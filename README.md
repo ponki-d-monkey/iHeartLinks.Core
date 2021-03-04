@@ -2,7 +2,7 @@
 
 [![Build Status](https://dev.azure.com/marlon-hizole/iHeartLinks/_apis/build/status/iHeartLinks.Core.CI?branchName=master)](https://dev.azure.com/marlon-hizole/iHeartLinks/_build/latest?definitionId=13&branchName=master)
 
-**iHeartLinks.Core** is a class library for implementing [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) in a RESTful API. It is a framework agnostic library that should be implemented and extended in specific frameworks. See [iHeartLinks.AspNetCore](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore) as an example - an implementation for ASP.NET core applications.
+**iHeartLinks.Core** is a class library for implementing [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) in a RESTful API. It is a framework agnostic library that should be implemented and extended in a specific framework. See [iHeartLinks.AspNetCore](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore) as an example - an implementation in ASP.NET core.
 
 ## Installation
 
@@ -14,7 +14,7 @@ PM> Install-Package iHeartLinks.Core
 
 ## Implementation
 
-Once installed, implement the [IHypermediaService](https://github.com/ponki-d-monkey/iHeartLinks.Core/blob/master/src/iHeartLinks.Core/IHypermediaService.cs) interface. It is an interface for retrieving URL's. See the [implementation](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore/blob/master/src/iHeartLinks.AspNetCore/HypermediaService.cs) for ASP.NET core as a guide.
+Once installed, implement the [IHypermediaService](https://github.com/ponki-d-monkey/iHeartLinks.Core/blob/master/src/iHeartLinks.Core/IHypermediaService.cs) interface. It is an interface for building links. See the [implementation](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore/blob/master/src/iHeartLinks.AspNetCore/HypermediaService.cs) for ASP.NET core as a guide.
 
 ## Extending
 
@@ -52,15 +52,6 @@ hypermediaService
  .AddSelf(model)
  .AddLink("get", $"https://your.api.com/person/{model.Id}"))
  .Document;
-```
-
-To pass a method name, call the overload.
-
-```csharp
-hypermediaService
-  .AddSelf(model)
-  .AddLink("get", $"https://your.api.com/person/{model.Id}", "GET"))
-  .Document;
 ```
 
 As seen in the example above, adding a link to a property of a class implementing `IHypermediaDocument` is possible. Another possible use of this method is when the property is a collection.
