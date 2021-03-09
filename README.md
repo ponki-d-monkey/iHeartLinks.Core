@@ -86,7 +86,7 @@ Multiple links can be added based on a single condition.
 hypermediaService
   .AddSelf(model)
   .AddLinksPerCondition(m => m.IsActive, b => b
-    .AddLink("update", $"https://your.api.com/person/{model.Id}", "POST")
-    .AddLink("deactivate", $"https://your.api.com/person/{model.Id}", "PATCH"))
+    .AddLink("update", $"https://your.api.com/person/{model.Id}")
+    .AddLink("deactivate", $"https://your.api.com/person/{model.Id}"))
   .Document;
 ```
