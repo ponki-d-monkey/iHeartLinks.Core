@@ -4,6 +4,6 @@
     {
         Link GetLink();
 
-        Link GetLink(string request, object args);
+        Link GetLink(LinkRequest request);
     }
 }
