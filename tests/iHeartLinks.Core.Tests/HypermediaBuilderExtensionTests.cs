@@ -25,8 +25,32 @@ namespace iHeartLinks.Core.Tests
             Func<IHypermediaBuilder<IHypermediaDocument>> func = () => default(IHypermediaBuilder<IHypermediaDocument>).AddLink(TestRel, TestHref);
 
             func.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("builder");
+        }
 
-            mockSut.Verify(x => x.AddLink(It.IsAny<string>(), It.IsAny<Link>()), Times.Never);
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void AddLinkShouldThrowArgumentExceptionWhenRelIs(string rel)
+        {
+            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => sut.AddLink(rel, TestHref);
+
+            var exception = func.Should().Throw<ArgumentException>().Which;
+            exception.Message.Should().Be("Parameter 'rel' must not be null or empty.");
+            exception.ParamName.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void AddLinkShouldThrowArgumentExceptionWhenHrefIs(string href)
+        {
+            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => sut.AddLink(TestRel, href);
+
+            var exception = func.Should().Throw<ArgumentException>().Which;
+            exception.Message.Should().Be("Parameter 'href' must not be null or empty.");
+            exception.ParamName.Should().BeNull();
         }
 
         [Fact]
@@ -45,6 +69,90 @@ namespace iHeartLinks.Core.Tests
         public void AddLinkShouldReturnSameInstanceOfHypermediaBuilder()
         {
             var result = sut.AddLink(TestRel, TestHref);
+
+            result.Should().BeSameAs(sut);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AddLinkWithConditionShouldThrowArgumentNullExceptionWhenBuilderIsNull(bool conditionHandlerResult)
+        {
+            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => default(IHypermediaBuilder<IHypermediaDocument>).AddLink(TestRel, TestHref, m => conditionHandlerResult);
+
+            func.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("builder");
+        }
+
+        [Theory]
+        [InlineData(null, true)]
+        [InlineData("", true)]
+        [InlineData(" ", true)]
+        [InlineData(null, false)]
+        [InlineData("", false)]
+        [InlineData(" ", false)]
+        public void AddLinkWithConditionShouldThrowArgumentExceptionWhenRelIs(string rel, bool conditionHandlerResult)
+        {
+            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => sut.AddLink(rel, TestHref, m => conditionHandlerResult);
+
+            var exception = func.Should().Throw<ArgumentException>().Which;
+            exception.Message.Should().Be("Parameter 'rel' must not be null or empty.");
+            exception.ParamName.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData(null, true)]
+        [InlineData("", true)]
+        [InlineData(" ", true)]
+        [InlineData(null, false)]
+        [InlineData("", false)]
+        [InlineData(" ", false)]
+        public void AddLinkWithConditionShouldThrowArgumentExceptionWhenHrefIs(string href, bool conditionHandlerResult)
+        {
+            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => sut.AddLink(TestRel, href, m => conditionHandlerResult);
+
+            var exception = func.Should().Throw<ArgumentException>().Which;
+            exception.Message.Should().Be("Parameter 'href' must not be null or empty.");
+            exception.ParamName.Should().BeNull();
+        }
+
+        [Fact]
+        public void AddLinkWithConditionShouldThrowArgumentNullExceptionWhenConditionHandlerIsNull()
+        {
+            Func<IHypermediaBuilder<IHypermediaDocument>> func = () => sut.AddLink(TestRel, TestHref, default);
+
+            func.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("conditionHandler");
+        }
+
+        [Fact]
+        public void AddLinkWithConditionShouldInvokeHypermediaBuilderAddLinkMethodWhenConditionHandlerReturnsTrue()
+        {
+            sut.AddLink(TestRel, TestHref, m => true);
+
+            mockSut.Verify(x =>
+                x.AddLink(
+                    It.Is<string>(y => y == TestRel),
+                    It.Is<Link>(y => y.Href == TestHref)),
+                Times.Once);
+        }
+
+        [Fact]
+        public void AddLinkWithConditionShouldNotInvokeHypermediaBuilderAddLinkMethodWhenConditionHandlerReturnsFalse()
+        {
+            sut.AddLink(TestRel, TestHref, m => false);
+
+            mockSut.Verify(x =>
+                x.AddLink(
+                    It.Is<string>(y => y == TestRel),
+                    It.Is<Link>(y => y.Href == TestHref)),
+                Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AddLinkWithConditionShouldReturnSameInstanceOfHypermediaBuilder(bool conditionHandlerResult)
+        {
+            var result = sut.AddLink(TestRel, TestHref, m => conditionHandlerResult);
 
             result.Should().BeSameAs(sut);
         }

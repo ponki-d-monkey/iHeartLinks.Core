@@ -14,15 +14,15 @@ PM> Install-Package iHeartLinks.Core
 
 ## Implementation
 
-Once installed, implement the [IHypermediaService](https://github.com/ponki-d-monkey/iHeartLinks.Core/blob/master/src/iHeartLinks.Core/IHypermediaService.cs) interface. It is an interface for building links. See the [implementation](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore/blob/master/src/iHeartLinks.AspNetCore/HypermediaService.cs) for ASP.NET core as a guide.
+Once installed, implement the [IHypermediaService](src/iHeartLinks.Core/IHypermediaService.cs) interface. It is an interface for building links. See the [implementation](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore/blob/master/src/iHeartLinks.AspNetCore/HypermediaService.cs) for ASP.NET core as a guide.
 
 ## Extending
 
-The **IHypermediaService** interface contains methods for retrieving URL's and it is used by the internal [HypermediaBuilder](https://github.com/ponki-d-monkey/iHeartLinks.Core/blob/master/src/iHeartLinks.Core/HypermediaBuilder.cs) class to build and add links to an instance of `IHypermediaDocument`. For convenience of creating and adding links, create extension methods of the [IHypermediaBuilder](https://github.com/ponki-d-monkey/iHeartLinks.Core/blob/master/src/iHeartLinks.Core/IHypermediaBuilder.cs) interface. See the [extension methods](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore/blob/master/src/iHeartLinks.AspNetCore/HypermediaBuilderExtension.cs) for ASP.NET core as a guide.
+The **IHypermediaService** interface contains methods for retrieving URL's and it is used by the internal [HypermediaBuilder](src/iHeartLinks.Core/HypermediaBuilder.cs) class to build and add links to an instance of `IHypermediaDocument`. For convenience of creating and adding links, create extension methods of the [IHypermediaBuilder](src/iHeartLinks.Core/IHypermediaBuilder.cs) interface. See the [extension methods](https://github.com/ponki-d-monkey/iHeartLinks.AspNetCore/blob/master/src/iHeartLinks.AspNetCore/HypermediaBuilderExtension.cs) for ASP.NET core as a guide.
 
 ## Adding links
 
-Start by adding a _"self"_ link.
+Start by adding a _self_ link.
 
 ```csharp
 hypermediaService
@@ -32,7 +32,7 @@ hypermediaService
 
 where `model` is an instance of a class implementing `IHypermediaDocument`.
 
-In case a _"self"_ link is not needed, use the `Prepare()` method. This can be used when adding links to a property of a class implementing `IHypermediaDocument` is needed.
+In case a _self_ link is not needed, use the `Prepare()` method. This can be used when adding links to a property of a class implementing `IHypermediaDocument` is needed.
 
 ```csharp
 hypermediaService
@@ -50,11 +50,20 @@ To add a link, call the `AddLink()` method.
 ```csharp
 hypermediaService
  .AddSelf(model)
- .AddLink("get", $"https://your.api.com/person/{model.Id}"))
+ .AddLink("update", $"https://your.api.com/person/{model.Id}"))
  .Document;
 ```
 
-As seen in the example above, adding a link to a property of a class implementing `IHypermediaDocument` is possible. Another possible use of this method is when the property is a collection.
+A condition can also be passed to `AddLink()`.
+
+```csharp
+hypermediaService
+ .AddSelf(model)
+ .AddLink("update", $"https://your.api.com/person/{model.Id}", m => m.IsActive))
+ .Document;
+```
+
+As seen in the example before, adding a link to a property of a class implementing `IHypermediaDocument` is possible. Another possible use of this method is when the property is a collection.
 
 ```csharp
 hypermediaService
@@ -65,7 +74,7 @@ hypermediaService
       {
           svc
               .Prepare(item)
-              .AddLink("get", $"https://your.api.com/person/child/{m.Child.Id}", "GET");
+              .AddLink("update", $"https://your.api.com/person/child/{m.Child.Id}");
       }
   })
   .Document;
@@ -77,7 +86,7 @@ Multiple links can be added based on a single condition.
 hypermediaService
   .AddSelf(model)
   .AddLinksPerCondition(m => m.IsActive, b => b
-    .AddLink("update", $"https://your.api.com/person/{model.Id}", "POST")
-    .AddLink("deactivate", $"https://your.api.com/person/{model.Id}", "PATCH"))
+    .AddLink("update", $"https://your.api.com/person/{model.Id}")
+    .AddLink("deactivate", $"https://your.api.com/person/{model.Id}"))
   .Document;
 ```

@@ -4,6 +4,32 @@ namespace iHeartLinks.Core
 {
     public static class HypermediaBuilderExtension
     {
+        public static IHypermediaBuilder<TDocument> AddLink<TDocument>(this IHypermediaBuilder<TDocument> builder, string rel, string href, Func<TDocument, bool> conditionHandler)
+            where TDocument : IHypermediaDocument
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (string.IsNullOrWhiteSpace(rel))
+            {
+                throw new ArgumentException($"Parameter '{nameof(rel)}' must not be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(href))
+            {
+                throw new ArgumentException($"Parameter '{nameof(href)}' must not be null or empty.");
+            }
+
+            if (conditionHandler == null)
+            {
+                throw new ArgumentNullException(nameof(conditionHandler));
+            }
+
+            return DoAddLinksPerCondition(builder, conditionHandler, b => DoAddLink(b, rel, href));
+        }
+
         public static IHypermediaBuilder<TDocument> AddLink<TDocument>(this IHypermediaBuilder<TDocument> builder, string rel, string href)
             where TDocument : IHypermediaDocument
         {
@@ -12,11 +38,12 @@ namespace iHeartLinks.Core
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            var link = new Link(href);
+            if (string.IsNullOrWhiteSpace(rel))
+            {
+                throw new ArgumentException($"Parameter '{nameof(rel)}' must not be null or empty.");
+            }
 
-            builder.AddLink(rel, link);
-
-            return builder;
+            return DoAddLink(builder, rel, href);
         }
 
         public static IHypermediaBuilder<TDocument> AddLinksToChild<TDocument>(this IHypermediaBuilder<TDocument> builder, Action<TDocument, IHypermediaService> childHandler)
@@ -55,6 +82,21 @@ namespace iHeartLinks.Core
                 throw new ArgumentNullException(nameof(builderHandler));
             }
 
+            return DoAddLinksPerCondition(builder, conditionHandler, builderHandler);
+        }
+
+        private static IHypermediaBuilder<TDocument> DoAddLink<TDocument>(IHypermediaBuilder<TDocument> builder, string rel, string href)
+            where TDocument : IHypermediaDocument
+        {
+            var link = new Link(href);
+
+            builder.AddLink(rel, link);
+
+            return builder;
+        }
+
+        private static IHypermediaBuilder<TDocument> DoAddLinksPerCondition<TDocument>(IHypermediaBuilder<TDocument> builder, Func<TDocument, bool> conditionHandler, Action<IHypermediaBuilder<TDocument>> builderHandler) where TDocument : IHypermediaDocument
+        {
             if (!conditionHandler.Invoke(builder.Document))
             {
                 return builder;
