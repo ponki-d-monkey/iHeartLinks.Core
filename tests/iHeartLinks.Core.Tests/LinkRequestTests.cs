@@ -118,7 +118,7 @@ namespace iHeartLinks.Core.Tests
         }
 
         [Fact]
-        public void GetValueOrDefaultWithTypeShouldReturnNullWhenValueDoesNotExist()
+        public void GetValueOrDefaultWithTypeShouldReturnDefaultWhenValueDoesNotExist()
         {
             var result = sut.GetValueOrDefault<int>(TestNonExistingKey);
 

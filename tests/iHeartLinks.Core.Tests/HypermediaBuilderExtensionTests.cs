@@ -116,7 +116,7 @@ namespace iHeartLinks.Core.Tests
         }
 
         [Fact]
-        public void AddLinkWithConditionShouldArgumentNullExceptionWhenConditionHandlerIsNull()
+        public void AddLinkWithConditionShouldThrowArgumentNullExceptionWhenConditionHandlerIsNull()
         {
             Func<IHypermediaBuilder<IHypermediaDocument>> func = () => sut.AddLink(TestRel, TestHref, default);
 
